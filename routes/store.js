@@ -16,8 +16,8 @@ router.post('/', async function (req, res) {
 
     delete obj.userId;
 
-    obj.store_accnum = {
-        $ref: "store",
+    obj.users = {
+        $ref: "users",
         $id: userId
     }
 
@@ -45,7 +45,9 @@ router.get('/', async function (req, res) {
     let data = await client.get("/store", {
         page,
         rows,
-        ...searchObj
+        ...searchObj,
+        submitType: "findJoin",
+        ref: "users"
     });
     res.send(data);
 });
