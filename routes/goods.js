@@ -18,13 +18,6 @@ router.post('/', async function (req, res) {
         $id: storeId
     }
 
-    obj.supp_gd_made = JSON.parse(obj.supp_gd_made);
-
-    obj.supp_gd_name = JSON.parse(obj.supp_gd_name);
-
-    obj.supp_gd_pic = JSON.parse(obj.supp_gd_pic);
-
-
     await client.post('/goods', obj);
     res.send({
         "status": 1
