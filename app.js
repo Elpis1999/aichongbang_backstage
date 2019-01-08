@@ -8,11 +8,8 @@ const session = require('express-session');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var storeRouter = require('./routes/store');
-<<<<<<< HEAD
 var supGodsRouter = require('./routes/suppilergoods');
-=======
 var goodsRouter = require('./routes/goods');
->>>>>>> update store goods router
 
 
 var app = express();
@@ -41,11 +38,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/store', storeRouter);
-<<<<<<< HEAD
 app.use('/supGods', supGodsRouter);
-=======
 app.use('/goods', goodsRouter);
->>>>>>> update store goods router
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
