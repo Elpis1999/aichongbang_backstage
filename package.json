@@ -7,7 +7,7 @@
   },
   "db": {
     "url": "mongodb://127.0.0.1:27017",
-    "dbname": "F53"
+    "dbname": "aichongbang_app"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
