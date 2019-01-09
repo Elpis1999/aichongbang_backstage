@@ -9,9 +9,21 @@ client.url('127.0.0.1:8080');
 
 // 查询
 router.get('/', async function (req, res) {
-    let { page, rows, type, value } = req.query;
-    let data = await client.get("/suppilergoods", { page, rows, submitType: "findJoin", ref: "suppiler" });
-    res.send(data);
+    let { page, rows, type, value, supId } = req.query;
+    let datas = await client.get("/suppilergoods", { page, rows, submitType: "findJoin", ref: "suppiler" });
+    // console.log(data)
+    let data = [];
+    if (supId) {
+        for (let i = 0; i < datas.length; i++) {
+            if (supId == datas[i].suppiler.$id) {
+                data.push(datas[i])
+            }
+        }
+        res.send(data);
+    } else {
+        data = datas;
+        res.send(data);
+    }
 })
 //通过ID查询
 router.get('/:id', async function (req, res) {
