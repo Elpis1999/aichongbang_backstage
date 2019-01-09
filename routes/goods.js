@@ -6,12 +6,20 @@ client.url('127.0.0.1:8080');
 //增加
 router.post('/', async function (req, res) {
     let {
-        storeId
+        storeId,
+        supId
     } = req.body;
 
     let obj = req.body;
-
+    delete obj.supId;
     delete obj.storeId;
+
+    if (supId) {
+        obj.suppiler = {
+            $ref: "suppiler",
+            $id: supId
+        }
+    }
 
     obj.store = {
         $ref: "store",
