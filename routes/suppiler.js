@@ -38,27 +38,29 @@ router.post('/', async function (req, res) {
 
 //查询
 router.get('/', async function (req, res) {
-    let {
-        type,
-        value,
-        page,
-        rows
-    } = req.query;
-    let searchObj = {};
-    if (type) {
-        searchObj = {
-            [type]: value || ""
-        };
-    }
-    let data = await client.get("/suppiler", {
-        page,
-        rows,
-        ...searchObj,
-        submitType: "findJoin",
-        ref: "suppiler"
-    });
-    res.send(data);
+  let {
+      page,
+      rows,
+      type,
+      value
+  } = req.query;
+  let searchObj = {};
+  if (type) {
+      searchObj = {
+          [type]: value || ""
+      };
+  }
+  let data = await client.get("/suppiler", {
+      page,
+      rows,
+      ...searchObj,
+      submitType: "findJoin",
+      ref: "suppiler"
+  });
+  res.send(data);
 });
+
+
 
 //删除
 router.delete('/:id', async function (req, res) {
