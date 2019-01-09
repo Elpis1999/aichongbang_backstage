@@ -13,7 +13,7 @@ router.post('/', async function (req, res) {
 });
 //查找
 router.get('/', async function (req, res) {
-  let data = await client.get("/suppiler", { page, rows, submitType: "findJoin", ref: "suppiler"});
+  let data = await client.get("/suppiler", {submitType: "findJoin", ref: "suppiler"});
   res.send(data)
   console.log(data)
 });
@@ -46,6 +46,7 @@ router.post("/upload", function (req, res) {
       uploadDir: "./public/upload"
   });
   form.parse(req, function (err, fields, suppiler) {
+    
       if (err) {
           res.send(err);
       } else {
