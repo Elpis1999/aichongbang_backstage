@@ -34,45 +34,32 @@ router.post('/', async function (req, res) {
     let { supp_gd_brand, supp_gd_title, supp_gd_type, supp_gd_material,
         made, supp_gd_appl, supp_gd_exc, supp_gd_install, supp_gd_taste,
         supp_gd_special, supp_gd_from, supp_gd_factor, supp_gd_keepquality,
-        supId, supp_gd_specialinfo, supp_gd_price, pigpic, smallpic } = req.body;
+        supId, supp_gd_specialinfo, supp_gd_price, bigpic, smallpic } = req.body;
 
-    let supp_gd_name = {
-        supp_gd_brand: supp_gd_brand,
-        supp_gd_title: supp_gd_title
-    }
-    let supp_gd_made = {
-        supp_gd_material: supp_gd_material,
-        made: made
-    }
-    let supp_gd_number = {
-        $ref: "suppiler", $id: supId,
-    }
-    let supp_gd_pic = {
-        pigpic: pigpic, smallpic: smallpic
-    }
     await client.post('/suppilergoods', {
-        supp_gd_name, supp_gd_type, supp_gd_made, supp_gd_appl,
-        supp_gd_exc, supp_gd_install, supp_gd_taste, supp_gd_special,
-        supp_gd_from, supp_gd_factor, supp_gd_keepquality,
-        supp_gd_number, supp_gd_specialinfo, supp_gd_price, supp_gd_pic
+        supp_gd_brand, supp_gd_title, supp_gd_type, supp_gd_material,
+        made, supp_gd_appl, supp_gd_exc, supp_gd_install, supp_gd_taste,
+        supp_gd_special, supp_gd_from, supp_gd_factor, supp_gd_keepquality,
+        supp_gd_suppiler: { $ref: "suppiler", $id: supId, },
+        supp_gd_specialinfo, supp_gd_price, bigpic, smallpic
     })
     res.send({ status: 1 });
 });
 
 //图片
-router.post("/upload", function (req, res) {
-    let form = new multiparty.Form({
-        uploadDir: "./public/upload"
-    });
-    form.parse(req, function (err, fields, files) {
-        if (err) {
-            res.send(err);
-        } else {
-            // console.log("files1",files[Object.keys(files)[0]][0].path);
-            res.send(path.basename(files[Object.keys(files)[0]][0].path));
-        }
-    });
-});
+// router.post("/upload", function (req, res) {
+//     let form = new multiparty.Form({
+//         uploadDir: "./public/upload"
+//     });
+//     form.parse(req, function (err, fields, files) {
+//         if (err) {
+//             res.send(err);
+//         } else {
+//             // console.log("files1",files[Object.keys(files)[0]][0].path);
+//             res.send(path.basename(files[Object.keys(files)[0]][0].path));
+//         }
+//     });
+// });
 
 
 module.exports = router;
