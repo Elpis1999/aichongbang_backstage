@@ -62,14 +62,14 @@ router.get('/:id', async function (req, res) {
 router.put("/:id", async function (req, res) {
     let id = req.params.id;
     let obj = req.body;
-    obj.supp_gd_made = JSON.parse(obj.supp_gd_made);
-
-    obj.supp_gd_name = JSON.parse(obj.supp_gd_name);
-
-    obj.supp_gd_pic = JSON.parse(obj.supp_gd_pic);
 
     delete obj._id;
-    
+
+    obj.store = {
+        $ref: "store",
+        $id: obj.store._id
+    }
+
     await client.put('/goods/' + id, obj);
     res.send({
         "status": 1
