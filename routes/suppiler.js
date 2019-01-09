@@ -12,11 +12,32 @@ router.post('/', async function (req, res) {
   res.send({ status: 1 });
 });
 //查找
+// router.get('/', async function (req, res) {
+//   let data = await client.get("/suppiler", {submitType: "findJoin", ref: "suppiler"});
+//   res.send(data)
+//   console.log(data)
+// });
+
+//查询
 router.get('/', async function (req, res) {
-  let data = await client.get("/suppiler", {submitType: "findJoin", ref: "suppiler"});
-  res.send(data)
-  console.log(data)
+  let {
+      type,
+      value
+  } = req.query;
+  let searchObj = {};
+  if (type) {
+      searchObj = {
+          [type]: value || ""
+      };
+  }
+  let data = await client.get("/suppiler", {
+      ...searchObj,
+      submitType: "findJoin",
+      ref: "suppiler"
+  });
+  res.send(data);
 });
+
 //删除
 router.delete('/:id', async function (req, res) {
   let id = req.params.id;
