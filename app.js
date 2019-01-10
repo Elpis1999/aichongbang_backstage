@@ -7,7 +7,6 @@ const session = require('express-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var serviceoderRouter = require('./routes/serviceoder');
 var servicerRouter = require('./routes/service');
 var orderRouter = require('./routes/order');
 
@@ -44,7 +43,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/serviceoder', serviceoderRouter);
 app.use('/service', servicerRouter);
 app.use('/store', storeRouter);
 app.use('/petmaster', petmasterRouter);
