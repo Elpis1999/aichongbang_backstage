@@ -38,7 +38,8 @@ router.get('/', async function (req, res) {
         page,
         rows,
         type,
-        value
+        value,
+        storeId
     } = req.query;
     let searchObj = {};
     if (type) {
@@ -51,6 +52,7 @@ router.get('/', async function (req, res) {
         rows,
         ...searchObj,
         submitType: "findJoin",
+        "store.$id": storeId,
         ref: "store"
     });
     res.send(data);
