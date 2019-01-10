@@ -6,9 +6,7 @@ const path = require("path");
 
 //获取session
 router.get('/getSession', function (req, res) {
-  res.send({
-    user: req.session.user
-  });
+  res.send(req.session.user);
 });
 
 //删除session
