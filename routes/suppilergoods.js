@@ -1,9 +1,6 @@
 var express = require('express');
-const multiparty = require('multiparty');
-const path = require('path');
 var router = express.Router();
 const client = require('ykt-http-client');
-// const lodash = require("lodash");
 client.url('127.0.0.1:8080');
 
 
@@ -27,6 +24,7 @@ router.get('/', async function (req, res) {
         rows,
         ...searchObj,
         submitType: "findJoin",
+        "suppiler.$id": supId,
         ref: "suppiler"
     });
     let data = [];
@@ -45,6 +43,7 @@ router.get('/', async function (req, res) {
     } else {
         res.send(newData);
     }
+    res.send(datas);
 })
 //通过ID查询
 router.get('/:id', async function (req, res) {

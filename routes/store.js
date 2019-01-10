@@ -34,7 +34,8 @@ router.get('/', async function (req, res) {
         page,
         rows,
         type,
-        value
+        value,
+        userId,
     } = req.query;
     let searchObj = {};
     if (type) {
@@ -47,6 +48,7 @@ router.get('/', async function (req, res) {
         rows,
         ...searchObj,
         submitType: "findJoin",
+        "users.$id": userId,
         ref: "users"
     });
     res.send(data);

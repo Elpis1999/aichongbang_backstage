@@ -6,18 +6,26 @@ client.url('127.0.0.1:8080');
 //增加
 router.post('/', async function (req, res) {
     let {
-        storeId
+        storeId,
+        supId
     } = req.body;
 
     let obj = req.body;
-
+    delete obj.supId;
     delete obj.storeId;
+
+    if (supId) {
+        obj.suppiler = {
+            $ref: "suppiler",
+            $id: supId
+        }
+    }
 
     obj.store = {
         $ref: "store",
         $id: storeId
     }
-
+    console.log(obj);
     await client.post('/goods', obj);
     res.send({
         "status": 1
@@ -30,7 +38,8 @@ router.get('/', async function (req, res) {
         page,
         rows,
         type,
-        value
+        value,
+        storeId
     } = req.query;
     let searchObj = {};
     if (type) {
@@ -43,8 +52,11 @@ router.get('/', async function (req, res) {
         rows,
         ...searchObj,
         submitType: "findJoin",
+        "store.$id": storeId,
         ref: "store"
     });
+    console.log("data1", data);
+    console.log("data2", data.rows);
     res.send(data);
 });
 
@@ -69,8 +81,9 @@ router.put("/:id", async function (req, res) {
         $ref: "store",
         $id: obj.store._id
     }
+    console.log("123", obj);
 
-    await client.put('/goods/' + id, obj);
+    let data = await client.put('/goods/' + id, obj);
     res.send({
         "status": 1
     });
