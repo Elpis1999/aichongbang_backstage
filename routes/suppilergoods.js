@@ -38,7 +38,9 @@ router.get('/', async function (req, res) {
                 data.push(datas[i])
             }
         }
+        newData.total = data.length;
         newData.rows = data;
+        console.log(newData)
         res.send(newData);
     } else {
         res.send(newData);
@@ -97,14 +99,15 @@ router.post('/', async function (req, res) {
         supp_gd_from,
         supp_gd_factor,
         supp_gd_keepquality,
-        supp_gd_suppiler: {
+        suppiler: {
             $ref: "suppiler",
             $id: supId,
         },
         supp_gd_specialinfo,
         supp_gd_price,
         bigpic,
-        smallpic
+        smallpic,
+        class: "1"
     })
     res.send({
         status: 1
@@ -126,5 +129,28 @@ router.post('/', async function (req, res) {
 //     });
 // });
 
+//修改
+router.put("/:id", async function (req, res) {
+    // router.post('/updata', function (req, res) {
+    let id = req.params.id;
+    let { supp_gd_brand, supp_gd_title, supp_gd_type, supp_gd_material, made, supp_gd_appl,
+        supp_gd_exc, supp_gd_install, supp_gd_taste, supp_gd_special, supp_gd_from, supp_gd_factor,
+        supp_gd_keepquality, supId, supp_gd_specialinfo, supp_gd_price, bigpic, smallpic } = req.body
+
+    await client.put("/suppilergoods/" + id, {
+        supp_gd_brand, supp_gd_title, supp_gd_type, supp_gd_material, made, supp_gd_appl,
+        supp_gd_exc, supp_gd_install, supp_gd_taste, supp_gd_special, supp_gd_from, supp_gd_factor,
+        supp_gd_keepquality,
+        suppiler: {
+            $ref: "suppiler",
+            $id: supId,
+        },
+        supp_gd_specialinfo, supp_gd_price, bigpic, smallpic,
+        class: "1"
+    });
+
+    res.send({ status: 1 });
+
+});
 
 module.exports = router;
