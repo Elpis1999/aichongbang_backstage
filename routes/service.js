@@ -32,12 +32,40 @@ router.put("/:id", async function (req, res) {
 
 // 查询
 router.get('/', async (req, res) => {
-    let { page, rows, type, value } = req.query;
+    let { page, rows, type, value ,sID} = req.query;
     let searchObj = {};
     if (type) {
         searchObj = { [type]: value };
     }
-    let data = await client.get('/service', { page, rows, submitType: 'findJoin', ref: 'store',...searchObj })
+    let datas = await client.get('/service', { submitType: 'findJoin', ref: 'store',...searchObj })
+  
+    let arr = [];
+    for(let i = 0;i<datas.length;i++){
+        if(datas[i].store._id==sID){
+            arr.push(datas[i])
+        }
+    }
+
+    let arrs=[]
+    let num =4;
+    let maxpage = Math.ceil(arr.length / rows);
+    for(let j=(page-1)*rows;j<arr.length;j++){
+         num--
+         if(num>0){
+           arrs.push(arr[j])
+         }
+         if(num<=0){
+             break;
+         }
+    }
+    let data = {
+        curpage:Number(page),
+        eachpage:Number(rows),
+        maxpage,
+        rows:arrs,
+        total:arr.length
+    }
+    
     res.send(data)
 })
 

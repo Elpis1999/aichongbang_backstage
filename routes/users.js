@@ -15,7 +15,7 @@ router.post('/', async function (req, res) {
 //验证用户名是否重复
 router.get('/', async function (req, res) {
   let data = await client.get('/users', {
-    userName: req.query.userName
+    userPhone: req.query.userPhone
   });
   if (data.length < 1) {
     res.send({
@@ -31,12 +31,12 @@ router.get('/', async function (req, res) {
 //登录验证
 router.post('/login', async function (req, res) {
   let {
-    userName,
-    userPWD
+    userPhone,
+    pwd
   } = req.body;
   let data = await client.get('/users', {
-    userName,
-    userPWD,
+    userPhone,
+    pwd,
     findType: 'exact'
   });
   if (data.length < 1) {
@@ -44,10 +44,8 @@ router.post('/login', async function (req, res) {
       "status": 0
     });
   } else {
-    req.session.user = req.body;
-    res.send({
-      "status": 1
-    });
+    req.session.user = data[0];
+    res.send(data[0]);
   }
 });
 
