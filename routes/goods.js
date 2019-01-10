@@ -25,7 +25,7 @@ router.post('/', async function (req, res) {
         $ref: "store",
         $id: storeId
     }
-
+    console.log(obj);
     await client.post('/goods', obj);
     res.send({
         "status": 1
@@ -55,6 +55,8 @@ router.get('/', async function (req, res) {
         "store.$id": storeId,
         ref: "store"
     });
+    console.log("data1", data);
+    console.log("data2", data.rows);
     res.send(data);
 });
 
@@ -79,8 +81,9 @@ router.put("/:id", async function (req, res) {
         $ref: "store",
         $id: obj.store._id
     }
+    console.log("123", obj);
 
-    await client.put('/goods/' + id, obj);
+    let data = await client.put('/goods/' + id, obj);
     res.send({
         "status": 1
     });
