@@ -14,7 +14,8 @@ router.post('/', async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     } = req.body;
     client.post('/suppiler', {
         supp_number,
@@ -23,7 +24,8 @@ router.post('/', async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     })
     res.send({
         status: 1
@@ -81,7 +83,8 @@ router.put("/:id", async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     } = req.body
     await client.put("/suppiler/" + id, {
         supp_number,
@@ -90,7 +93,8 @@ router.put("/:id", async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     });
     res.send({
         status: 1
