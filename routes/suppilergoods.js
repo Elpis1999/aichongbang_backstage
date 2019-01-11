@@ -24,7 +24,7 @@ router.get('/', async function (req, res) {
         rows,
         ...searchObj,
         submitType: "findJoin",
-        "suppiler.$id": supId,
+        // "suppiler.$id": supId,
         ref: "suppiler"
     });
     let data = [];
@@ -43,7 +43,7 @@ router.get('/', async function (req, res) {
     } else {
         res.send(newData);
     }
-    res.send(datas);
+    // res.send(datas);
 })
 //通过ID查询
 router.get('/:id', async function (req, res) {
