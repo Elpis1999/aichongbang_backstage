@@ -11,7 +11,8 @@ var storeRouter = require('./routes/store');
 var petmasterRouter = require('./routes/petmaster');
 var supGodsRouter = require('./routes/suppilergoods');
 var goodsRouter = require('./routes/goods');
-
+var platformUsersRouter = require('./routes/platformUsers');
+var platformStoresRouter = require('./routes/platformStores');
 var suppilerRouter = require('./routes/suppiler');
 
 var app = express();
@@ -36,7 +37,8 @@ app.use(session({
 
 
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use('/platformStores', platformStoresRouter);
+app.use('/platformUsers',platformUsersRouter)
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/store', storeRouter);
