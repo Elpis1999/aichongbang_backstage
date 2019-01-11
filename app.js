@@ -7,6 +7,11 @@ const session = require('express-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var servicerRouter = require('./routes/service');
+var orderRouter = require('./routes/order');
+var countRouter = require('./routes/count');
+
+
 var storeRouter = require('./routes/store');
 var petmasterRouter = require('./routes/petmaster');
 var supGodsRouter = require('./routes/suppilergoods');
@@ -41,8 +46,12 @@ app.use('/platformStores', platformStoresRouter);
 app.use('/platformUsers',platformUsersRouter)
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/service', servicerRouter);
 app.use('/store', storeRouter);
 app.use('/petmaster', petmasterRouter);
+app.use('/order', orderRouter);
+app.use('/count', countRouter);
+
 
 app.use('/supGods', supGodsRouter);
 app.use('/goods', goodsRouter);
