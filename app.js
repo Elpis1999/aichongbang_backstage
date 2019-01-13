@@ -4,20 +4,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session');
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var servicerRouter = require('./routes/service');
 var orderRouter = require('./routes/order');
-
-
 var storeRouter = require('./routes/store');
 var petmasterRouter = require('./routes/petmaster');
 var supGodsRouter = require('./routes/suppilergoods');
 var goodsRouter = require('./routes/goods');
-
 var suppilerRouter = require('./routes/suppiler');
-
+var suppjinghuoRouter = require('./routes/suppjinghuo');
 var app = express();
 
 // view engine setup
@@ -47,7 +43,7 @@ app.use('/service', servicerRouter);
 app.use('/store', storeRouter);
 app.use('/petmaster', petmasterRouter);
 app.use('/order', orderRouter);
-
+app.use('/suppjinghuo',suppjinghuoRouter)
 app.use('/supGods', supGodsRouter);
 app.use('/goods', goodsRouter);
 app.use('/suppiler', suppilerRouter);

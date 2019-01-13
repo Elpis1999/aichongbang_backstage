@@ -17,7 +17,7 @@ router.post('/', async function (req, res) {
         supp_note,
         supp_status
     } = req.body;
-    client.post('/suppiler', {
+    let data = await client.post('/suppiler', {
         supp_number,
         supp_name,
         supp_add,
@@ -27,9 +27,9 @@ router.post('/', async function (req, res) {
         supp_note,
         supp_status
     })
-    res.send({
-        status: 1
-    });
+    res.send(
+       data
+    );
 });
 //查找
 // router.get('/', async function (req, res) {

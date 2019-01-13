@@ -51,6 +51,7 @@ router.get('/', async function (req, res) {
         "users.$id": userId,
         ref: "users"
     });
+    console.log(data,"门店")
     res.send(data);
 });
 
