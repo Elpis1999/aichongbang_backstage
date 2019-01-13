@@ -11,7 +11,7 @@ router.post('/', async function (req, res) {
     client.post('/service', {store:{
         $ref: "store",
         $id: storeid
-    },sur_name , sur_date , sur_rules , sur_time , sur_level , sur_price,sur_weight})
+    },sur_name , sur_date , sur_rules , sur_time , sur_level , sur_price,sur_weight,class:"2"})
   
     res.send({ status: 1 });
   });
@@ -24,7 +24,7 @@ router.put("/:id", async function (req, res) {
     await client.put("/service/" + id, { store: {
         $ref: "store",
         $id: storeObj.store.$id
-    },sur_name , sur_date , sur_rules , sur_time , sur_level , sur_price
+    },sur_name , sur_date , sur_rules , sur_time , sur_level , sur_price ,class:"2"
     });
     res.send({ status: 1 });
   });
