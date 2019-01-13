@@ -6,10 +6,6 @@ const path = require("path");
 
 //获取session
 router.get('/getSession', function (req, res) {
-<<<<<<< HEAD
-  console.log(req.session.user)
-=======
->>>>>>> d5d89d7086f1a999b7523337032440538fb24818
   res.send(req.session.user);
 });
 
