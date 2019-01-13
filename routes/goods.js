@@ -56,399 +56,633 @@ router.get('/', async function (req, res) {
         "store.$id": storeId,
         ref: "store"
     });
-    console.log("data1", data);
-    console.log("data2", data.rows);
     res.send(data);
 });
 
-//查询商品月销量
+//查询商品销量
 router.get('/mgoodsSalesVolume', async function (req, res) {
     let {
-        storeId
+        storeId,
+        year
     } = req.query;
     let order = await client.get("/order");
     let orderArr = [];
+    //找到属于当前店铺的订单
     for (let i = 0; i < order.length; i++) {
         if (storeId === order[i].store.$id) {
             orderArr.push(order[i])
         }
     }
-    let date = new Date().getMonth();
-    let year = new Date().getFullYear();
-    if (date === 0) {
-        date = 12;
-        year = parseInt(year) - 1;
-    }
-    let upMonthOrder = [];
 
+    //找到当前年已完成的订单
+    let newOrderArr = [];
     for (let i = 0; i < orderArr.length; i++) {
-        if (orderArr[i].time.split("-")[1] == date && orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
+        if (orderArr[i].time.split("-")[0] == year && orderArr[i].state === "已完成") {
+            newOrderArr.push(orderArr[i]);
         }
     }
 
-    let goodsArr = [];
-
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        goodsArr.push(...upMonthOrder[i].order_goods);
-    }
-
-    let axisData = [];
-    let seriesData = [];
-
-    let newArr = _.uniqWith(goodsArr, _.isEqual)
-
-    for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < goodsArr.length; j++) {
-
-
-            if (newArr[i].goodsName == goodsArr[j].goodsName) {
-                name = goodsArr[j].goodsName;
-                number += parseInt(goodsArr[j].number);
-            }
-        }
-        axisData.push(name);
-        seriesData.push(number);
-    }
-
-    res.send({
-        axisData,
-        seriesData,
-    });
-});
-
-//查询商品季销量
-router.get('/qgoodsSalesVolume', async function (req, res) {
-    let {
-        storeId
-    } = req.query;
-    let order = await client.get("/order");
-    let orderArr = [];
-    for (let i = 0; i < order.length; i++) {
-        if (storeId === order[i].store.$id) {
-            orderArr.push(order[i])
+    //将订单按12个月分
+    let monthGoods;
+    let january = [];
+    let february = [];
+    let march = [];
+    let april = [];
+    let may = [];
+    let june = [];
+    let july = [];
+    let august = [];
+    let september = [];
+    let october = [];
+    let november = [];
+    let december = [];
+    for (let i = 0; i < newOrderArr.length; i++) {
+        if (newOrderArr[i].time.split("-")[1] == 1) {
+            january.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 2) {
+            february.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 3) {
+            march.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 4) {
+            april.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 5) {
+            may.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 6) {
+            june.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 7) {
+            july.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 8) {
+            august.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 9) {
+            september.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 10) {
+            october.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 11) {
+            november.push(...newOrderArr[i].order_goods);
+        } else if (newOrderArr[i].time.split("-")[1] == 12) {
+            december.push(...newOrderArr[i].order_goods);
         }
     }
-    let date = new Date().getMonth() + 1;
-    let year = new Date().getFullYear();
-    let inSeason = [];
+    monthGoods = [january,
+        february,
+        march,
+        april,
+        may,
+        june,
+        july,
+        august,
+        september,
+        october,
+        november,
+        december
+    ];
 
-    if (date == 1 || date == 2 || date == 3) {
-        inSeason = [10, 11, 12];
-    } else if (date == 4 || date == 5 || date == 6) {
-        inSeason = [1, 2, 3];
-    } else if (date == 7 || date == 8 || date == 9) {
-        inSeason = [4, 5, 6];
-    } else {
-        inSeason = [7, 8, 9];
+    let newMonthGoods = [];
+    for (let i = 0; i < monthGoods.length; i++) {
+        newMonthGoods.push(...monthGoods[i]);
     }
-
-
-
-    if ((date - 1) === 0) {
-        year = parseInt(year) - 1;
-    }
-    let upMonthOrder = [];
-
-    for (let i = 0; i < orderArr.length; i++) {
-        if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
-                orderArr[i].time.split("-")[1] == inSeason[1] ||
-                orderArr[i].time.split("-")[1] == inSeason[2]) &&
-            orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
-        }
-    }
-
-    let goodsArr = [];
-
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        goodsArr.push(...upMonthOrder[i].order_goods);
-    }
-
-    let axisData = [];
-    let seriesData = [];
-
-    let newArr = _.uniqWith(goodsArr, _.isEqual)
-
-    for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < goodsArr.length; j++) {
-
-
-            if (newArr[i].goodsName == goodsArr[j].goodsName) {
-                name = goodsArr[j].goodsName;
-                number += parseInt(goodsArr[j].number);
-            }
-        }
-        axisData.push(name);
-        seriesData.push(number);
-    }
-
-    res.send({
-        axisData,
-        seriesData,
-    });
-});
-//查询商品年销量
-router.get('/ygoodsSalesVolume', async function (req, res) {
-    let {
-        storeId
-    } = req.query;
-    let order = await client.get("/order");
-    let orderArr = [];
-    for (let i = 0; i < order.length; i++) {
-        if (storeId === order[i].store.$id) {
-            orderArr.push(order[i])
-        }
-    }
-    let year = new Date().getFullYear() - 1;
-
-    let upMonthOrder = [];
-
-    for (let i = 0; i < orderArr.length; i++) {
-        if (orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
-        }
-    }
-
-    let goodsArr = [];
-
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        goodsArr.push(...upMonthOrder[i].order_goods);
-    }
-
-    let axisData = [];
-    let seriesData = [];
-
-    let newArr = _.uniqWith(goodsArr, _.isEqual)
-
-    for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < goodsArr.length; j++) {
-            if (newArr[i].goodsName == goodsArr[j].goodsName) {
-                name = goodsArr[j].goodsName;
-                number += parseInt(goodsArr[j].number);
-            }
-        }
-        axisData.push(name);
-        seriesData.push(number);
-    }
-
-    res.send({
-        axisData,
-        seriesData,
-    });
-
-});
-//查询月服务预约量
-router.get('/mserviceSalesVolume', async function (req, res) {
-    let {
-        storeId
-    } = req.query;
-    let order = await client.get("/order");
-    let orderArr = [];
-    for (let i = 0; i < order.length; i++) {
-        if (storeId === order[i].store.$id) {
-            orderArr.push(order[i])
-        }
-    }
-    let date = new Date().getMonth();
-    let year = new Date().getFullYear();
-    if (date === 0) {
-        date = 12;
-        year = parseInt(year) - 1;
-    }
-    let upMonthOrder = [];
-
-    for (let i = 0; i < orderArr.length; i++) {
-        if (orderArr[i].time.split("-")[1] == date && orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
-        }
-    }
-
-    let serviceArr = [];
-
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        serviceArr.push(...upMonthOrder[i].order_serve);
-    }
-
-    let axisData = [];
-    let seriesData = [];
 
     //数组去重
-    let hash = {};
-    let newArr = serviceArr.reduce(function (item, next) {
-        hash[next.name] ? '' : hash[next.name] = true && item.push(next);
-        return item
-    }, [])
+    let newArr = _.uniqWith(newMonthGoods, _.isEqual)
 
+    let seriesData = [];
+    let axisData = [];
     for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < serviceArr.length; j++) {
-            if (newArr[i].serveName == serviceArr[j].serveName) {
-                name = serviceArr[j].serveName;
-                number += 1;
+        let name = newArr[i].goodsName;
+        axisData.push(newArr[i].goodsName);
+        let numberData = [];
+        for (let j = 0; j < monthGoods.length; j++) {
+            let number = 0;
+            for (let k = 0; k < monthGoods[j].length; k++) {
+                if (monthGoods[j][k].goodsName === newArr[i].goodsName) {
+                    number += parseInt(monthGoods[j][k].number);
+                }
             }
+            numberData.push(number);
         }
-        axisData.push(name);
-        seriesData.push(number);
+        seriesData.push({
+            name,
+            type: "line",
+            stack: name+"销售量",
+            smooth: true,
+            data: numberData
+        });
     }
 
     res.send({
         axisData,
         seriesData
     });
+    // let date = new Date().getMonth();
+    // let year = new Date().getFullYear();
+    // if (date === 0) {
+    //     date = 12;
+    //     year = parseInt(year) - 1;
+    // }
+    // let upMonthOrder = [];
 
+    // for (let i = 0; i < 12; i++) {
+    //     if (orderArr[i].time.split("-")[1] == date && orderArr[i].time.split("-")[0] == year) {
+    //         upMonthOrder.push(orderArr[i])
+    //     }
+
+    // }
+
+    // let goodsArr = [];
+
+    // for (let i = 0; i < upMonthOrder.length; i++) {
+    //     goodsArr.push(...upMonthOrder[i].order_goods);
+    // }
+
+    // let axisData = [];
+    // let seriesData = [];
+
+    // let newArr = _.uniqWith(goodsArr, _.isEqual)
+
+    // for (let i = 0; i < newArr.length; i++) {
+    //     let number = 0;
+    //     let name = "";
+    //     for (let j = 0; j < goodsArr.length; j++) {
+
+
+    //         if (newArr[i].goodsName == goodsArr[j].goodsName) {
+    //             name = goodsArr[j].goodsName;
+    //             number += parseInt(goodsArr[j].number);
+    //         }
+    //     }
+    //     axisData.push(name);
+    //     seriesData.push(number);
+    // }
+    // let newSeriesData = [];
+    // for (let i = 0; i < axisData.length; i++) {
+    //     newSeriesData.push({
+    //         name: axisData[i],
+    //         type: "line",
+    //         stack: "总量",
+    //         data: [120, 132, 101, 134, 90, 230, 210]
+    //     });
+    // }
+    // console.log(newSeriesData,"newSeriesData");
+    // res.send({
+    //     axisData,
+    //     seriesData,
+    //     goodsArr,
+    //     orderArr,
+    //     upMonthOrder
+    // });
 });
 
-//查询季服务预约量
-router.get('/qserviceSalesVolume', async function (req, res) {
+// //查询商品季销量
+// router.get('/qgoodsSalesVolume', async function (req, res) {
+//     let {
+//         storeId
+//     } = req.query;
+//     let order = await client.get("/order");
+//     let orderArr = [];
+//     for (let i = 0; i < order.length; i++) {
+//         if (storeId === order[i].store.$id) {
+//             orderArr.push(order[i])
+//         }
+//     }
+//     let date = new Date().getMonth() + 1;
+//     let year = new Date().getFullYear();
+//     let inSeason = [];
+
+//     if (date == 1 || date == 2 || date == 3) {
+//         inSeason = [10, 11, 12];
+//     } else if (date == 4 || date == 5 || date == 6) {
+//         inSeason = [1, 2, 3];
+//     } else if (date == 7 || date == 8 || date == 9) {
+//         inSeason = [4, 5, 6];
+//     } else {
+//         inSeason = [7, 8, 9];
+//     }
+
+
+
+//     if ((date - 1) === 0) {
+//         year = parseInt(year) - 1;
+//     }
+//     let upMonthOrder = [];
+
+//     for (let i = 0; i < orderArr.length; i++) {
+//         if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
+//                 orderArr[i].time.split("-")[1] == inSeason[1] ||
+//                 orderArr[i].time.split("-")[1] == inSeason[2]) &&
+//             orderArr[i].time.split("-")[0] == year) {
+//             upMonthOrder.push(orderArr[i])
+//         }
+//     }
+
+//     let goodsArr = [];
+
+//     for (let i = 0; i < upMonthOrder.length; i++) {
+//         goodsArr.push(...upMonthOrder[i].order_goods);
+//     }
+
+//     let axisData = [];
+//     let seriesData = [];
+
+//     let newArr = _.uniqWith(goodsArr, _.isEqual)
+
+//     for (let i = 0; i < newArr.length; i++) {
+//         let number = 0;
+//         let name = "";
+//         for (let j = 0; j < goodsArr.length; j++) {
+
+
+//             if (newArr[i].goodsName == goodsArr[j].goodsName) {
+//                 name = goodsArr[j].goodsName;
+//                 number += parseInt(goodsArr[j].number);
+//             }
+//         }
+//         axisData.push(name);
+//         seriesData.push(number);
+//     }
+
+//     res.send({
+//         axisData,
+//         seriesData,
+//     });
+// });
+// //查询商品年销量
+// router.get('/ygoodsSalesVolume', async function (req, res) {
+//     let {
+//         storeId
+//     } = req.query;
+//     let order = await client.get("/order");
+//     let orderArr = [];
+//     for (let i = 0; i < order.length; i++) {
+//         if (storeId === order[i].store.$id) {
+//             orderArr.push(order[i])
+//         }
+//     }
+//     let year = new Date().getFullYear() - 1;
+
+//     let upMonthOrder = [];
+
+//     for (let i = 0; i < orderArr.length; i++) {
+//         if (orderArr[i].time.split("-")[0] == year) {
+//             upMonthOrder.push(orderArr[i])
+//         }
+//     }
+
+//     let goodsArr = [];
+
+//     for (let i = 0; i < upMonthOrder.length; i++) {
+//         goodsArr.push(...upMonthOrder[i].order_goods);
+//     }
+
+//     let axisData = [];
+//     let seriesData = [];
+
+//     let newArr = _.uniqWith(goodsArr, _.isEqual)
+
+//     for (let i = 0; i < newArr.length; i++) {
+//         let number = 0;
+//         let name = "";
+//         for (let j = 0; j < goodsArr.length; j++) {
+//             if (newArr[i].goodsName == goodsArr[j].goodsName) {
+//                 name = goodsArr[j].goodsName;
+//                 number += parseInt(goodsArr[j].number);
+//             }
+//         }
+//         axisData.push(name);
+//         seriesData.push(number);
+//     }
+
+//     res.send({
+//         axisData,
+//         seriesData,
+//     });
+
+// });
+//查询月服务预约量
+router.get('/mserviceSalesVolume', async function (req, res) {
+    // let {
+    //     storeId
+    // } = req.query;
+    // let order = await client.get("/order");
+    // let orderArr = [];
+    // for (let i = 0; i < order.length; i++) {
+    //     if (storeId === order[i].store.$id) {
+    //         orderArr.push(order[i])
+    //     }
+    // }
+    // let date = new Date().getMonth();
+    // let year = new Date().getFullYear();
+    // if (date === 0) {
+    //     date = 12;
+    //     year = parseInt(year) - 1;
+    // }
+    // let upMonthOrder = [];
+
+    // for (let i = 0; i < orderArr.length; i++) {
+    //     if (orderArr[i].time.split("-")[1] == date && orderArr[i].time.split("-")[0] == year) {
+    //         upMonthOrder.push(orderArr[i])
+    //     }
+    // }
+
+    // let serviceArr = [];
+
+    // for (let i = 0; i < upMonthOrder.length; i++) {
+    //     serviceArr.push(...upMonthOrder[i].order_serve);
+    // }
+
+    // let axisData = [];
+    // let seriesData = [];
+
+    // //数组去重
+    // let hash = {};
+    // let newArr = serviceArr.reduce(function (item, next) {
+    //     hash[next.name] ? '' : hash[next.name] = true && item.push(next);
+    //     return item
+    // }, [])
+
+    // for (let i = 0; i < newArr.length; i++) {
+    //     let number = 0;
+    //     let name = "";
+    //     for (let j = 0; j < serviceArr.length; j++) {
+    //         if (newArr[i].serveName == serviceArr[j].serveName) {
+    //             name = serviceArr[j].serveName;
+    //             number += 1;
+    //         }
+    //     }
+    //     axisData.push(name);
+    //     seriesData.push(number);
+    // }
+
+    // res.send({
+    //     axisData,
+    //     seriesData
+    // });
+
+
+
     let {
-        storeId
+        storeId,
+        year
     } = req.query;
     let order = await client.get("/order");
     let orderArr = [];
+    //找到属于当前店铺的订单
     for (let i = 0; i < order.length; i++) {
         if (storeId === order[i].store.$id) {
             orderArr.push(order[i])
         }
     }
-    let date = new Date().getMonth() + 1;
-    let year = new Date().getFullYear();
-    let inSeason = [];
 
-    if (date == 1 || date == 2 || date == 3) {
-        inSeason = [10, 11, 12];
-    } else if (date == 4 || date == 5 || date == 6) {
-        inSeason = [1, 2, 3];
-    } else if (date == 7 || date == 8 || date == 9) {
-        inSeason = [4, 5, 6];
-    } else {
-        inSeason = [7, 8, 9];
-    }
-
-
-
-    if ((date - 1) === 0) {
-        year = parseInt(year) - 1;
-    }
-    let upMonthOrder = [];
-
+    //找到当前年已完成的订单
+    let newOrderArr = [];
     for (let i = 0; i < orderArr.length; i++) {
-        if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
-                orderArr[i].time.split("-")[1] == inSeason[1] ||
-                orderArr[i].time.split("-")[1] == inSeason[2]) &&
-            orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
+        if (orderArr[i].time.split("-")[0] == year && orderArr[i].state === "已完成") {
+            newOrderArr.push(orderArr[i]);
         }
     }
 
-    let serviceArr = [];
+    //将订单按12个月分
+    let monthService;
+    let january = [];
+    let february = [];
+    let march = [];
+    let april = [];
+    let may = [];
+    let june = [];
+    let july = [];
+    let august = [];
+    let september = [];
+    let october = [];
+    let november = [];
+    let december = [];
+    for (let i = 0; i < newOrderArr.length; i++) {
+        if (newOrderArr[i].time.split("-")[1] == 1) {
+            january.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 2) {
+            february.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 3) {
+            march.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 4) {
+            april.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 5) {
+            may.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 6) {
+            june.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 7) {
+            july.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 8) {
+            august.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 9) {
+            september.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 10) {
+            october.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 11) {
+            november.push(...newOrderArr[i].order_serve);
+        } else if (newOrderArr[i].time.split("-")[1] == 12) {
+            december.push(...newOrderArr[i].order_serve);
+        }
+    }
+    monthService = [january,
+        february,
+        march,
+        april,
+        may,
+        june,
+        july,
+        august,
+        september,
+        october,
+        november,
+        december
+    ];
 
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        serviceArr.push(...upMonthOrder[i].order_serve);
+    let newMonthService = [];
+    for (let i = 0; i < monthService.length; i++) {
+        newMonthService.push(...monthService[i]);
     }
 
-    let axisData = [];
-    let seriesData = [];
-
-    // let newArr = _.uniqWith(goodsArr, _.isEqual)
     //数组去重
-    let hash = {};
-    let newArr = serviceArr.reduce(function (item, next) {
-        hash[next.name] ? '' : hash[next.name] = true && item.push(next);
-        return item
-    }, [])
-
-
-    for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < serviceArr.length; j++) {
-
-
-            if (newArr[i].serveName == serviceArr[j].serveName) {
-                name = serviceArr[j].serveName;
-                number += 1;
-            }
+    let newArr = [];
+    var obj = {};
+    for (var i = 0; i < newMonthService.length; i++) {
+        if (!obj[newMonthService[i].serveName]) {
+            newArr.push(newMonthService[i]);
+            obj[newMonthService[i].serveName] = true;
         }
-        axisData.push(name);
-        seriesData.push(number);
+    }
+
+    let seriesData = [];
+    let axisData = [];
+    for (let i = 0; i < newArr.length; i++) {
+        let name = newArr[i].serveName;
+        axisData.push(newArr[i].serveName);
+        let numberData = [];
+        for (let j = 0; j < monthService.length; j++) {
+            let number = 0;
+            for (let k = 0; k < monthService[j].length; k++) {
+                if (monthService[j][k].serveName === newArr[i].serveName) {
+                    number += 1;
+                }
+            }
+            numberData.push(number);
+        }
+        seriesData.push({
+            name,
+            type: "line",
+            stack: name+"订单量",
+            smooth: true,
+            data: numberData
+        });
     }
 
     res.send({
         axisData,
-        seriesData,
+        seriesData
     });
-
 });
-//查询年服务预约量
-router.get('/yserviceSalesVolume', async function (req, res) {
 
-    let {
-        storeId
-    } = req.query;
-    let order = await client.get("/order");
-    let orderArr = [];
-    for (let i = 0; i < order.length; i++) {
-        if (storeId === order[i].store.$id) {
-            orderArr.push(order[i])
-        }
-    }
-    let year = new Date().getFullYear() - 1;
+// //查询季服务预约量
+// router.get('/qserviceSalesVolume', async function (req, res) {
+//     let {
+//         storeId
+//     } = req.query;
+//     let order = await client.get("/order");
+//     let orderArr = [];
+//     for (let i = 0; i < order.length; i++) {
+//         if (storeId === order[i].store.$id) {
+//             orderArr.push(order[i])
+//         }
+//     }
+//     let date = new Date().getMonth() + 1;
+//     let year = new Date().getFullYear();
+//     let inSeason = [];
 
-    let upMonthOrder = [];
-
-    for (let i = 0; i < orderArr.length; i++) {
-        if (orderArr[i].time.split("-")[0] == year) {
-            upMonthOrder.push(orderArr[i])
-        }
-    }
-
-    let serviceArr = [];
-
-    for (let i = 0; i < upMonthOrder.length; i++) {
-        serviceArr.push(...upMonthOrder[i].order_serve);
-    }
-
-    let axisData = [];
-    let seriesData = [];
-
-    // let newArr = _.uniqWith(goodsArr, _.isEqual)
-    //数组去重
-    let hash = {};
-    let newArr = serviceArr.reduce(function (item, next) {
-        hash[next.name] ? '' : hash[next.name] = true && item.push(next);
-        return item
-    }, [])
+//     if (date == 1 || date == 2 || date == 3) {
+//         inSeason = [10, 11, 12];
+//     } else if (date == 4 || date == 5 || date == 6) {
+//         inSeason = [1, 2, 3];
+//     } else if (date == 7 || date == 8 || date == 9) {
+//         inSeason = [4, 5, 6];
+//     } else {
+//         inSeason = [7, 8, 9];
+//     }
 
 
-    for (let i = 0; i < newArr.length; i++) {
-        let number = 0;
-        let name = "";
-        for (let j = 0; j < serviceArr.length; j++) {
+
+//     if ((date - 1) === 0) {
+//         year = parseInt(year) - 1;
+//     }
+//     let upMonthOrder = [];
+
+//     for (let i = 0; i < orderArr.length; i++) {
+//         if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
+//                 orderArr[i].time.split("-")[1] == inSeason[1] ||
+//                 orderArr[i].time.split("-")[1] == inSeason[2]) &&
+//             orderArr[i].time.split("-")[0] == year) {
+//             upMonthOrder.push(orderArr[i])
+//         }
+//     }
+
+//     let serviceArr = [];
+
+//     for (let i = 0; i < upMonthOrder.length; i++) {
+//         serviceArr.push(...upMonthOrder[i].order_serve);
+//     }
+
+//     let axisData = [];
+//     let seriesData = [];
+
+//     // let newArr = _.uniqWith(goodsArr, _.isEqual)
+//     //数组去重
+//     let hash = {};
+//     let newArr = serviceArr.reduce(function (item, next) {
+//         hash[next.name] ? '' : hash[next.name] = true && item.push(next);
+//         return item
+//     }, [])
 
 
-            if (newArr[i].serveName == serviceArr[j].serveName) {
-                name = serviceArr[j].serveName;
-                number += 1;
-            }
-        }
-        axisData.push(name);
-        seriesData.push(number);
-    }
+//     for (let i = 0; i < newArr.length; i++) {
+//         let number = 0;
+//         let name = "";
+//         for (let j = 0; j < serviceArr.length; j++) {
 
-    res.send({
-        axisData,
-        seriesData,
-    });
 
-});
+//             if (newArr[i].serveName == serviceArr[j].serveName) {
+//                 name = serviceArr[j].serveName;
+//                 number += 1;
+//             }
+//         }
+//         axisData.push(name);
+//         seriesData.push(number);
+//     }
+
+//     res.send({
+//         axisData,
+//         seriesData,
+//     });
+
+// });
+// //查询年服务预约量
+// router.get('/yserviceSalesVolume', async function (req, res) {
+
+//     let {
+//         storeId
+//     } = req.query;
+//     let order = await client.get("/order");
+//     let orderArr = [];
+//     for (let i = 0; i < order.length; i++) {
+//         if (storeId === order[i].store.$id) {
+//             orderArr.push(order[i])
+//         }
+//     }
+//     let year = new Date().getFullYear() - 1;
+
+//     let upMonthOrder = [];
+
+//     for (let i = 0; i < orderArr.length; i++) {
+//         if (orderArr[i].time.split("-")[0] == year) {
+//             upMonthOrder.push(orderArr[i])
+//         }
+//     }
+
+//     let serviceArr = [];
+
+//     for (let i = 0; i < upMonthOrder.length; i++) {
+//         serviceArr.push(...upMonthOrder[i].order_serve);
+//     }
+
+//     let axisData = [];
+//     let seriesData = [];
+
+//     // let newArr = _.uniqWith(goodsArr, _.isEqual)
+//     //数组去重
+//     let hash = {};
+//     let newArr = serviceArr.reduce(function (item, next) {
+//         hash[next.name] ? '' : hash[next.name] = true && item.push(next);
+//         return item
+//     }, [])
+
+
+//     for (let i = 0; i < newArr.length; i++) {
+//         let number = 0;
+//         let name = "";
+//         for (let j = 0; j < serviceArr.length; j++) {
+
+
+//             if (newArr[i].serveName == serviceArr[j].serveName) {
+//                 name = serviceArr[j].serveName;
+//                 number += 1;
+//             }
+//         }
+//         axisData.push(name);
+//         seriesData.push(number);
+//     }
+
+//     res.send({
+//         axisData,
+//         seriesData,
+//     });
+
+// });
 //查询ID
 router.get('/:id', async function (req, res) {
     let id = req.params.id;
