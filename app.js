@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session');
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var servicerRouter = require('./routes/service');
@@ -19,7 +18,7 @@ var goodsRouter = require('./routes/goods');
 var platformUsersRouter = require('./routes/platformUsers');
 var platformStoresRouter = require('./routes/platformStores');
 var suppilerRouter = require('./routes/suppiler');
-
+var suppjinghuoRouter = require('./routes/suppjinghuo');
 var app = express();
 
 // view engine setup
@@ -50,6 +49,7 @@ app.use('/service', servicerRouter);
 app.use('/store', storeRouter);
 app.use('/petmaster', petmasterRouter);
 app.use('/order', orderRouter);
+app.use('/suppjinghuo',suppjinghuoRouter)
 app.use('/count', countRouter);
 
 

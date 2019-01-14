@@ -14,20 +14,22 @@ router.post('/', async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     } = req.body;
-    client.post('/suppiler', {
+    let data = await client.post('/suppiler', {
         supp_number,
         supp_name,
         supp_add,
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     })
-    res.send({
-        status: 1
-    });
+    res.send(
+       data
+    );
 });
 //查找
 // router.get('/', async function (req, res) {
@@ -81,7 +83,8 @@ router.put("/:id", async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     } = req.body
     await client.put("/suppiler/" + id, {
         supp_number,
@@ -90,7 +93,8 @@ router.put("/:id", async function (req, res) {
         supp_phone,
         supp_web,
         supp_bus_pic,
-        supp_note
+        supp_note,
+        supp_status
     });
     res.send({
         status: 1
