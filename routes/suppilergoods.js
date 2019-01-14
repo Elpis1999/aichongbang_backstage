@@ -3,6 +3,38 @@ var router = express.Router();
 const client = require('ykt-http-client');
 client.url('127.0.0.1:8080');
 
+// 统计销量
+router.get("/SVTJ", async function (req, res) {
+    let { supID } = req.query;  //获取供应商的ID
+    console.log(supID)
+    let odData = await client.get("/order")//获取所有的订单信息
+    let goodss = await client.get("/goods", { submitType: "findJoin", "suppiler.$id": supID, ref: "suppiler" })//查询来自该供应商的所有商品
+    //拿到供应商ID，查询门店商品集合中属于这个供应商的所有商品； 查询订单中ID和查询到的门店商品ID一致的；
+    //进行分类  循环出两个数组 一个用来放商品品类  一个放商品数量
+    let newArr = [];
+    for (let i = 0; i < goodss.length; i++) {
+        for (let j = 0; j < odData.length; j++) {
+            for (let k = 0; k < odData[j].order_goods.length; k++) {
+                if (goodss[i]._id == odData[j].order_goods[k].goodsId) {
+                    if (newArr.length == 0) {
+                        newArr.push({ "name": odData[j].order_goods[k].goodsName, "nums": odData[j].order_goods[k].number })
+                    } else {
+                        for (let n = 0; n < newArr.length; n++) {
+                            if (odData[j].order_goods[k].goodsName == newArr[n].name) {
+                                newArr[n].nums = parseInt(newArr[n].nums) + parseInt(odData[j].order_goods[k].number);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    res.send({
+        newArr: newArr
+    });
+
+})
+
 
 // 查询
 router.get('/', async function (req, res) {
@@ -112,21 +144,6 @@ router.post('/', async function (req, res) {
         status: 1
     });
 });
-
-//图片
-// router.post("/upload", function (req, res) {
-//     let form = new multiparty.Form({
-//         uploadDir: "./public/upload"
-//     });
-//     form.parse(req, function (err, fields, files) {
-//         if (err) {
-//             res.send(err);
-//         } else {
-//             // console.log("files1",files[Object.keys(files)[0]][0].path);
-//             res.send(path.basename(files[Object.keys(files)[0]][0].path));
-//         }
-//     });
-// });
 
 //修改
 router.put("/:id", async function (req, res) {
