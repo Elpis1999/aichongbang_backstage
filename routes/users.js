@@ -29,6 +29,7 @@ router.get('/', async function (req, res) {
 });
 
 //登录验证
+//判断是否是已审核的用户
 router.post('/login', async function (req, res) {
   let {
     userPhone,
@@ -48,5 +49,28 @@ router.post('/login', async function (req, res) {
     res.send(data[0]);
   }
 });
+
+//判断是否注册
+router.post('/isRegisted', async function (req, res) {
+  let {
+    userPhone,
+    pwd
+  } = req.body;
+  let data = await client.get('/users', {
+    userPhone,
+    pwd,
+    findType: 'exact'
+  });
+  if (data.length < 1) {
+    res.send({
+      "status": 0
+    });
+  } else {
+    req.session.user = data[0];
+    res.send(data[0]);
+  }
+});
+
+
 
 module.exports = router;
