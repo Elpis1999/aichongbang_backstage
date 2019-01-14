@@ -35,7 +35,7 @@ router.post('/login', async function (req, res) {
     userPhone,
     pwd
   } = req.body;
-  let data = await client.get('/passUsers', {
+  let data = await client.get('/users', {
     userPhone,
     pwd,
     findType: 'exact'

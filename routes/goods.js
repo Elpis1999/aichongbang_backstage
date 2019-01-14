@@ -163,7 +163,7 @@ router.get('/mgoodsSalesVolume', async function (req, res) {
         seriesData.push({
             name,
             type: "line",
-            stack: name+"销售量",
+            stack: name + "销售量",
             smooth: true,
             data: numberData
         });
@@ -233,78 +233,155 @@ router.get('/mgoodsSalesVolume', async function (req, res) {
 });
 
 // //查询商品季销量
-// router.get('/qgoodsSalesVolume', async function (req, res) {
-//     let {
-//         storeId
-//     } = req.query;
-//     let order = await client.get("/order");
-//     let orderArr = [];
-//     for (let i = 0; i < order.length; i++) {
-//         if (storeId === order[i].store.$id) {
-//             orderArr.push(order[i])
-//         }
-//     }
-//     let date = new Date().getMonth() + 1;
-//     let year = new Date().getFullYear();
-//     let inSeason = [];
+router.get('/qgoodsSalesVolume', async function (req, res) {
+    let {
+        storeId,
+        year
+    } = req.query;
+    let order = await client.get("/order");
+    let orderArr = [];
+    //找到属于当前店铺的订单
+    for (let i = 0; i < order.length; i++) {
+        if (storeId === order[i].store.$id) {
+            orderArr.push(order[i])
+        }
+    }
 
-//     if (date == 1 || date == 2 || date == 3) {
-//         inSeason = [10, 11, 12];
-//     } else if (date == 4 || date == 5 || date == 6) {
-//         inSeason = [1, 2, 3];
-//     } else if (date == 7 || date == 8 || date == 9) {
-//         inSeason = [4, 5, 6];
-//     } else {
-//         inSeason = [7, 8, 9];
-//     }
+    //找到当前年已完成的订单
+    let newOrderArr = [];
+    for (let i = 0; i < orderArr.length; i++) {
+        if (orderArr[i].time.split("-")[0] == year && orderArr[i].state === "已完成") {
+            newOrderArr.push(orderArr[i]);
+        }
+    }
+
+    //将订单按4个季度分
+    let monthGoods;
+    let spring = [];
+    let summer = [];
+    let autumn = [];
+    let winter = [];
+    for (let i = 0; i < newOrderArr.length; i++) {
+        let month = newOrderArr[i].time.split("-")[1];
+        if (month == 1 || month == 2 || month == 3) {
+            spring.push(...newOrderArr[i].order_goods);
+        } else if (month == 4 || month == 5 || month == 6) {
+            summer.push(...newOrderArr[i].order_goods);
+        } else if (month == 7 || month == 8 || month == 9) {
+            autumn.push(...newOrderArr[i].order_goods);
+        } else if (month == 10 || month == 11 || month == 12) {
+            winter.push(...newOrderArr[i].order_goods);
+        }
+    }
+    monthGoods = [spring, summer, autumn, winter];
+
+    let newMonthGoods = [];
+    for (let i = 0; i < monthGoods.length; i++) {
+        newMonthGoods.push(...monthGoods[i]);
+    }
+
+    //数组去重
+    let newArr = _.uniqWith(newMonthGoods, _.isEqual)
+
+    let series = [];
+    let source = [];
+    source.push(["season", "spring", "summer", "autumn", "winter"]);
+
+    for (let i = 0; i < newArr.length; i++) {
+        let arr = [];
+        arr.push(newArr[i].goodsName);
+        for (let j = 0; j < monthGoods.length; j++) {
+            let number = 0;
+            for (let k = 0; k < monthGoods[j].length; k++) {
+                if (newArr[i].goodsName == monthGoods[j][k].goodsName) {
+                    number += parseInt(monthGoods[j][k].number);
+                }
+            }
+            arr.push(number);
+        }
+        source.push(arr);
+        series.push({
+            type: "bar",
+            seriesLayoutBy: "row"
+        });
+    }
+
+
+    res.send({
+        source,
+        series
+    });
+    // let {
+    //     storeId
+    // } = req.query;
+    // let order = await client.get("/order");
+    // let orderArr = [];
+    // for (let i = 0; i < order.length; i++) {
+    //     if (storeId === order[i].store.$id) {
+    //         orderArr.push(order[i])
+    //     }
+    // }
+    // let date = new Date().getMonth() + 1;
+    // let year = new Date().getFullYear();
+    // let inSeason = [];
+
+    // if (date == 1 || date == 2 || date == 3) {
+    //     inSeason = [10, 11, 12];
+    // } else if (date == 4 || date == 5 || date == 6) {
+    //     inSeason = [1, 2, 3];
+    // } else if (date == 7 || date == 8 || date == 9) {
+    //     inSeason = [4, 5, 6];
+    // } else {
+    //     inSeason = [7, 8, 9];
+    // }
 
 
 
-//     if ((date - 1) === 0) {
-//         year = parseInt(year) - 1;
-//     }
-//     let upMonthOrder = [];
+    // if ((date - 1) === 0) {
+    //     year = parseInt(year) - 1;
+    // }
+    // let upMonthOrder = [];
 
-//     for (let i = 0; i < orderArr.length; i++) {
-//         if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
-//                 orderArr[i].time.split("-")[1] == inSeason[1] ||
-//                 orderArr[i].time.split("-")[1] == inSeason[2]) &&
-//             orderArr[i].time.split("-")[0] == year) {
-//             upMonthOrder.push(orderArr[i])
-//         }
-//     }
+    // for (let i = 0; i < orderArr.length; i++) {
+    //     if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
+    //             orderArr[i].time.split("-")[1] == inSeason[1] ||
+    //             orderArr[i].time.split("-")[1] == inSeason[2]) &&
+    //         orderArr[i].time.split("-")[0] == year) {
+    //         upMonthOrder.push(orderArr[i])
+    //     }
+    // }
 
-//     let goodsArr = [];
+    // let goodsArr = [];
 
-//     for (let i = 0; i < upMonthOrder.length; i++) {
-//         goodsArr.push(...upMonthOrder[i].order_goods);
-//     }
+    // for (let i = 0; i < upMonthOrder.length; i++) {
+    //     goodsArr.push(...upMonthOrder[i].order_goods);
+    // }
 
-//     let axisData = [];
-//     let seriesData = [];
+    // let axisData = [];
+    // let seriesData = [];
 
-//     let newArr = _.uniqWith(goodsArr, _.isEqual)
+    // let newArr = _.uniqWith(goodsArr, _.isEqual)
 
-//     for (let i = 0; i < newArr.length; i++) {
-//         let number = 0;
-//         let name = "";
-//         for (let j = 0; j < goodsArr.length; j++) {
+    // for (let i = 0; i < newArr.length; i++) {
+    //     let number = 0;
+    //     let name = "";
+    //     for (let j = 0; j < goodsArr.length; j++) {
 
 
-//             if (newArr[i].goodsName == goodsArr[j].goodsName) {
-//                 name = goodsArr[j].goodsName;
-//                 number += parseInt(goodsArr[j].number);
-//             }
-//         }
-//         axisData.push(name);
-//         seriesData.push(number);
-//     }
+    //         if (newArr[i].goodsName == goodsArr[j].goodsName) {
+    //             name = goodsArr[j].goodsName;
+    //             number += parseInt(goodsArr[j].number);
+    //         }
+    //     }
+    //     axisData.push(name);
+    //     seriesData.push(number);
+    // }
 
-//     res.send({
-//         axisData,
-//         seriesData,
-//     });
-// });
+    // res.send({
+    //     axisData,
+    //     seriesData,
+    // });
+});
 // //查询商品年销量
 // router.get('/ygoodsSalesVolume', async function (req, res) {
 //     let {
@@ -528,7 +605,7 @@ router.get('/mserviceSalesVolume', async function (req, res) {
         seriesData.push({
             name,
             type: "line",
-            stack: name+"订单量",
+            stack: name + "订单量",
             smooth: true,
             data: numberData
         });
@@ -541,86 +618,171 @@ router.get('/mserviceSalesVolume', async function (req, res) {
 });
 
 // //查询季服务预约量
-// router.get('/qserviceSalesVolume', async function (req, res) {
-//     let {
-//         storeId
-//     } = req.query;
-//     let order = await client.get("/order");
-//     let orderArr = [];
-//     for (let i = 0; i < order.length; i++) {
-//         if (storeId === order[i].store.$id) {
-//             orderArr.push(order[i])
-//         }
-//     }
-//     let date = new Date().getMonth() + 1;
-//     let year = new Date().getFullYear();
-//     let inSeason = [];
+router.get('/qserviceSalesVolume', async function (req, res) {
+    let {
+        storeId,
+        year
+    } = req.query;
+    let order = await client.get("/order");
+    let orderArr = [];
+    //找到属于当前店铺的订单
+    for (let i = 0; i < order.length; i++) {
+        if (storeId === order[i].store.$id) {
+            orderArr.push(order[i])
+        }
+    }
 
-//     if (date == 1 || date == 2 || date == 3) {
-//         inSeason = [10, 11, 12];
-//     } else if (date == 4 || date == 5 || date == 6) {
-//         inSeason = [1, 2, 3];
-//     } else if (date == 7 || date == 8 || date == 9) {
-//         inSeason = [4, 5, 6];
-//     } else {
-//         inSeason = [7, 8, 9];
-//     }
+    //找到当前年已完成的订单
+    let newOrderArr = [];
+    for (let i = 0; i < orderArr.length; i++) {
+        if (orderArr[i].time.split("-")[0] == year && orderArr[i].state === "已完成") {
+            newOrderArr.push(orderArr[i]);
+        }
+    }
+
+    //将订单按4个季度分
+    let MonthService;
+    let spring = [];
+    let summer = [];
+    let autumn = [];
+    let winter = [];
+    for (let i = 0; i < newOrderArr.length; i++) {
+        let month = newOrderArr[i].time.split("-")[1];
+        if (month == 1 || month == 2 || month == 3) {
+            spring.push(...newOrderArr[i].order_serve);
+        } else if (month == 4 || month == 5 || month == 6) {
+            summer.push(...newOrderArr[i].order_serve);
+        } else if (month == 7 || month == 8 || month == 9) {
+            autumn.push(...newOrderArr[i].order_serve);
+        } else if (month == 10 || month == 11 || month == 12) {
+            winter.push(...newOrderArr[i].order_serve);
+        }
+    }
+    monthService = [spring, summer, autumn, winter];
+
+    let newMonthService = [];
+    for (let i = 0; i < monthService.length; i++) {
+        newMonthService.push(...monthService[i]);
+    }
+
+    //数组去重
+    let newArr = [];
+    var obj = {};
+    for (var i = 0; i < newMonthService.length; i++) {
+        if (!obj[newMonthService[i].serveName]) {
+            newArr.push(newMonthService[i]);
+            obj[newMonthService[i].serveName] = true;
+        }
+    }
+
+    let series = [];
+    let source = [];
+    source.push(["season", "spring", "summer", "autumn", "winter"]);
+
+    for (let i = 0; i < newArr.length; i++) {
+        let arr = [];
+        arr.push(newArr[i].serveName);
+        for (let j = 0; j < monthService.length; j++) {
+            let number = 0;
+            for (let k = 0; k < monthService[j].length; k++) {
+                if (newArr[i].serveName == monthService[j][k].serveName) {
+                    number += 1;
+                }
+            }
+            arr.push(number);
+        }
+        source.push(arr);
+        series.push({
+            type: "bar",
+            seriesLayoutBy: "row"
+        });
+    }
+
+
+    res.send({
+        source,
+        series
+    });
+
+    // let {
+    //     storeId
+    // } = req.query;
+    // let order = await client.get("/order");
+    // let orderArr = [];
+    // for (let i = 0; i < order.length; i++) {
+    //     if (storeId === order[i].store.$id) {
+    //         orderArr.push(order[i])
+    //     }
+    // }
+    // let date = new Date().getMonth() + 1;
+    // let year = new Date().getFullYear();
+    // let inSeason = [];
+
+    // if (date == 1 || date == 2 || date == 3) {
+    //     inSeason = [10, 11, 12];
+    // } else if (date == 4 || date == 5 || date == 6) {
+    //     inSeason = [1, 2, 3];
+    // } else if (date == 7 || date == 8 || date == 9) {
+    //     inSeason = [4, 5, 6];
+    // } else {
+    //     inSeason = [7, 8, 9];
+    // }
 
 
 
-//     if ((date - 1) === 0) {
-//         year = parseInt(year) - 1;
-//     }
-//     let upMonthOrder = [];
+    // if ((date - 1) === 0) {
+    //     year = parseInt(year) - 1;
+    // }
+    // let upMonthOrder = [];
 
-//     for (let i = 0; i < orderArr.length; i++) {
-//         if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
-//                 orderArr[i].time.split("-")[1] == inSeason[1] ||
-//                 orderArr[i].time.split("-")[1] == inSeason[2]) &&
-//             orderArr[i].time.split("-")[0] == year) {
-//             upMonthOrder.push(orderArr[i])
-//         }
-//     }
+    // for (let i = 0; i < orderArr.length; i++) {
+    //     if ((orderArr[i].time.split("-")[1] == inSeason[0] ||
+    //             orderArr[i].time.split("-")[1] == inSeason[1] ||
+    //             orderArr[i].time.split("-")[1] == inSeason[2]) &&
+    //         orderArr[i].time.split("-")[0] == year) {
+    //         upMonthOrder.push(orderArr[i])
+    //     }
+    // }
 
-//     let serviceArr = [];
+    // let serviceArr = [];
 
-//     for (let i = 0; i < upMonthOrder.length; i++) {
-//         serviceArr.push(...upMonthOrder[i].order_serve);
-//     }
+    // for (let i = 0; i < upMonthOrder.length; i++) {
+    //     serviceArr.push(...upMonthOrder[i].order_serve);
+    // }
 
-//     let axisData = [];
-//     let seriesData = [];
+    // let axisData = [];
+    // let seriesData = [];
 
-//     // let newArr = _.uniqWith(goodsArr, _.isEqual)
-//     //数组去重
-//     let hash = {};
-//     let newArr = serviceArr.reduce(function (item, next) {
-//         hash[next.name] ? '' : hash[next.name] = true && item.push(next);
-//         return item
-//     }, [])
-
-
-//     for (let i = 0; i < newArr.length; i++) {
-//         let number = 0;
-//         let name = "";
-//         for (let j = 0; j < serviceArr.length; j++) {
+    // // let newArr = _.uniqWith(goodsArr, _.isEqual)
+    // //数组去重
+    // let hash = {};
+    // let newArr = serviceArr.reduce(function (item, next) {
+    //     hash[next.name] ? '' : hash[next.name] = true && item.push(next);
+    //     return item
+    // }, [])
 
 
-//             if (newArr[i].serveName == serviceArr[j].serveName) {
-//                 name = serviceArr[j].serveName;
-//                 number += 1;
-//             }
-//         }
-//         axisData.push(name);
-//         seriesData.push(number);
-//     }
+    // for (let i = 0; i < newArr.length; i++) {
+    //     let number = 0;
+    //     let name = "";
+    //     for (let j = 0; j < serviceArr.length; j++) {
 
-//     res.send({
-//         axisData,
-//         seriesData,
-//     });
 
-// });
+    //         if (newArr[i].serveName == serviceArr[j].serveName) {
+    //             name = serviceArr[j].serveName;
+    //             number += 1;
+    //         }
+    //     }
+    //     axisData.push(name);
+    //     seriesData.push(number);
+    // }
+
+    // res.send({
+    //     axisData,
+    //     seriesData,
+    // });
+
+});
 // //查询年服务预约量
 // router.get('/yserviceSalesVolume', async function (req, res) {
 
