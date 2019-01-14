@@ -76,13 +76,22 @@ router.delete("/refuse/:id", async function (req, res) {
   })
   //删
 
-//   router.delete("/:id", async function (req, res) {
-//     let id = req.params.id
-//     await client.delete('/stores/' + id)
-//     res.send({ 
-//         status: 1
-//      })
-//   })
+  router.delete("/:id", async function (req, res) {
+    let id = req.params.id
+    await client.delete('/passStores/' + id)
+    res.send({ 
+        status: 1
+     })
+  })
+
+  router.put("/:id", async function (req, res) {
+    console.log("来了")
+    let id = req.params.id
+    let { store_name,store_bus_number,store_bus_pic,store_bus_addr,longitude,latitude,store_city,store_person,store_phone,store_avatar,store_charactor,store_VIPlevel,store_money,store_clerk,store_status } = req.body;
+    let data = await client.put("/passStore/" + id, {store_name,store_bus_number,store_bus_pic,store_bus_addr,longitude,latitude,store_city,store_person,store_phone,store_avatar,store_charactor,store_VIPlevel,store_money,store_clerk,store_status})
+    res.send(data)
+    console.log(data)
+  })
 
 
 
