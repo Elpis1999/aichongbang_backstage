@@ -107,10 +107,14 @@ router.get('/:id',async function(req,res){
         for(let i = 0;i<countData.length;i++){
             let months = countData[i].time.split('-')
             // console.log(months[0]);
-           
-           if(months[1]<7 && months[0]==year){
-               arr.push(countData[i])//获取了门店里面的所有商品和服务信息
+           if(countData[i].state=="已完成"){
+            if(months[1]<7 && months[0]==year){
+                arr.push(countData[i])//获取了门店里面的所有商品和服务信息
+            }
+           }else{
+
            }
+           
         }
         let goods =[];//商品
         let serve =[];//服务
@@ -295,9 +299,14 @@ router.get('/:id',async function(req,res){
         for(let i = 0;i<countData.length;i++){
             let months = countData[i].time.split('-')
            
-           if(months[1]>6 && months[0]==year){
-               arr.push(countData[i])
-           }
+            if(countData[i].state=="已完成"){
+                if(months[1]>6 && months[0]==year){
+                    arr.push(countData[i])
+                }
+            }else{
+                
+            }
+           
         }
         let goods =[];//商品
         let serve =[];//服务
