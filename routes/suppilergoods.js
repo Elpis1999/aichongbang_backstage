@@ -15,13 +15,15 @@ router.get("/SVTJ", async function (req, res) {
     for (let i = 0; i < goodss.length; i++) {
         for (let j = 0; j < odData.length; j++) {
             for (let k = 0; k < odData[j].order_goods.length; k++) {
-                if (goodss[i]._id == odData[j].order_goods[k].goodsId) {
-                    if (newArr.length == 0) {
-                        newArr.push({ "name": odData[j].order_goods[k].goodsName, "nums": odData[j].order_goods[k].number })
-                    } else {
-                        for (let n = 0; n < newArr.length; n++) {
-                            if (odData[j].order_goods[k].goodsName == newArr[n].name) {
-                                newArr[n].nums = parseInt(newArr[n].nums) + parseInt(odData[j].order_goods[k].number);
+                if (odData[j].state == "已完成") {
+                    if (goodss[i]._id == odData[j].order_goods[k].goodsId) {
+                        if (newArr.length == 0) {
+                            newArr.push({ "name": odData[j].order_goods[k].goodsName, "nums": odData[j].order_goods[k].number })
+                        } else {
+                            for (let n = 0; n < newArr.length; n++) {
+                                if (odData[j].order_goods[k].goodsName == newArr[n].name) {
+                                    newArr[n].nums = parseInt(newArr[n].nums) + parseInt(odData[j].order_goods[k].number);
+                                }
                             }
                         }
                     }
