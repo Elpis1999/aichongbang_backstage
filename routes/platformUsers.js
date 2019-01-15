@@ -19,7 +19,7 @@ router.post('/',async function (req,res){
 })
 //添加用户
 router.post('/pass',async function (req,res){
-    let data = await client.post('/passUsers',req.body)
+    let data = await client.post('/users',req.body)
     res.send({
         data
     })
@@ -28,7 +28,7 @@ router.post('/pass',async function (req,res){
 
 router.delete("/:id", async function (req, res) {
     let id = req.params.id
-    await client.delete('/passUsers/' + id)
+    await client.delete('/users/' + id)
     res.send({ 
         status: 1
      })
@@ -69,8 +69,14 @@ router.delete("/:id", async function (req, res) {
   router.get('/', async (req, res) => {
       console.log("1")
     let { userPhone,pwd,permissions,status,name,email } = req.query;
-    let data = await client.get("/passUsers", { userPhone,pwd,permissions,status,name,email })
-    res.send(data)
+    let data = await client.get("/users", { userPhone,pwd,permissions,status,name,email })
+    let tempArr=[]
+    for(let i = 0; i<data.length;i++){
+        if(data[i].status=="已审核"){
+            tempArr.push(data[i])
+        }
+    }
+     res.send(tempArr);
     console.log(data)
     //查
   })
@@ -93,6 +99,12 @@ router.delete("/:id", async function (req, res) {
         ...searchObj
     });
     console.log("data为："+data)
-    res.send(data);
+    let tempArr=[]
+    for(let i = 0; i<data.length;i++){
+        if(data[i].status=="未审核"){
+            tempArr.push(data[i])
+        }
+    }
+     res.send(tempArr);
 });
 module.exports = router;

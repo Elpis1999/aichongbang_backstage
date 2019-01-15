@@ -35,11 +35,13 @@ router.post('/login', async function (req, res) {
     userPhone,
     pwd
   } = req.body;
-  let data = await client.get('/passUsers', {
+  let data = await client.get('/users', {
     userPhone,
     pwd,
+    status:"已审核",
     findType: 'exact'
   });
+  
   if (data.length < 1) {
     res.send({
       "status": 0
@@ -72,5 +74,67 @@ router.post('/isRegisted', async function (req, res) {
 });
 
 
+router.get('/shop', async function (req, res) {
+
+  let {
+
+    page,
+
+    rows,
+
+    type,
+
+    value
+
+  } = req.query;
+
+  let searchObj = {};
+
+  if (type) {
+
+    searchObj = {
+
+      [type]: value || ""
+
+    };
+
+  }
+
+  let data = await client.get("/store", {
+
+    page,
+
+    rows,
+
+    ...searchObj,
+
+    submitType: "findJoin",
+
+    ref: "users"
+
+  });
+  let tempArr=[]
+  for(let i = 0; i<data.length;i++){
+      if(data[i].store_status=="已审核"||data[i].store_status=="已关闭"){
+          console.log(data[i].store_status)
+          tempArr.push(data[i])
+      }
+  }
+
+  let shopAddr = [];
+
+  tempArr.forEach(function (ele,i) {
+
+    shopAddr.push([ele.longitude,ele.latitude,ele.store_bus_addr,ele.store_name]);
+
+    console.log(i)
+
+  });
+
+  res.send(shopAddr);
+
+  
+
+});
 
 module.exports = router;

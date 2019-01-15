@@ -10,7 +10,7 @@ var servicerRouter = require('./routes/service');
 var orderRouter = require('./routes/order');
 var countRouter = require('./routes/count');
 
-
+var goodsAndServeRouter = require('./routes/goodsAndServe');
 var storeRouter = require('./routes/store');
 var petmasterRouter = require('./routes/petmaster');
 var supGodsRouter = require('./routes/suppilergoods');
@@ -51,8 +51,7 @@ app.use('/petmaster', petmasterRouter);
 app.use('/order', orderRouter);
 app.use('/suppjinghuo',suppjinghuoRouter)
 app.use('/count', countRouter);
-
-
+app.use('/goodsAndServe', goodsAndServeRouter);
 app.use('/supGods', supGodsRouter);
 app.use('/goods', goodsRouter);
 app.use('/suppiler', suppilerRouter);

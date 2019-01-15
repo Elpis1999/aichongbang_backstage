@@ -56,6 +56,7 @@ router.get('/', async function (req, res) {
         "store.$id": storeId,
         ref: "store"
     });
+    console.log("daaaa",data);
     res.send(data);
 });
 
